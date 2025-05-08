@@ -15,8 +15,8 @@ void ABicycleHUD::DrawHUD() {
 void ABicycleHUD::BeginPlay() {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(countdownTimerHandle, this, &ABicycleHUD::timerFinished, 3.0f, false);
-	ShowTimeWidget();
+	//GetWorldTimerManager().SetTimer(countdownTimerHandle, this, &ABicycleHUD::timerFinished, 3.0f, false);
+	//ShowTimeWidget();
 }
 
 void ABicycleHUD::ShowGameWidget() {
@@ -35,6 +35,15 @@ void ABicycleHUD::ShowTimeWidget() {
 		TimeWidget->AddToViewport();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Show Timer"));
+}
+
+void ABicycleHUD::ShowFinishWidget() {
+	APlayerController* playerController = GetOwningPlayerController();
+	if (playerController && FinishWidgetClass) {
+		FinishWidget = CreateWidget<UUserWidget>(GetWorld(), FinishWidgetClass);
+		FinishWidget->AddToViewport();
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Show Finish"));
 }
 
 void ABicycleHUD::timerFinished() {

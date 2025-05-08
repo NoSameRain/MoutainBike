@@ -22,6 +22,7 @@ public:
 
 	class UUserWidget* GameWidget;
 
+	UFUNCTION(BlueprintCallable, Category = "Speed")
 	void ShowGameWidget();
 
 	UPROPERTY(EditAnywhere, Category = "Time")
@@ -30,6 +31,13 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Time")
 	class UUserWidget* TimeWidget;
 
+	UPROPERTY(EditAnywhere, Category = "Time")
+	TSubclassOf<class UUserWidget> FinishWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Time")
+	class UUserWidget* FinishWidget;
+
+	UFUNCTION(BlueprintCallable, Category = "Speed")
 	void ShowTimeWidget();
 
 	UPROPERTY(EditAnywhere, Category = "Speed")
@@ -39,13 +47,17 @@ public:
 	float GetPlayerSpeed();
 	
 
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+	void timerFinished();
+		
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+	void ShowFinishWidget();
 
 protected:
 	virtual void BeginPlay() override;
 
 	FTimerHandle countdownTimerHandle;
 
-	void timerFinished();
 
 	
 };
