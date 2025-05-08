@@ -4,10 +4,15 @@
 #include "BikePlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "BikePawn.h"
+#include "Bike/HUD/BicycleHUD.h"
+
+
 
 void ABikePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	BikeHUD = Cast<ABicycleHUD>(GetHUD());
 }
 
 void ABikePlayerController::SetupInputComponent()
@@ -31,6 +36,13 @@ void ABikePlayerController::Tick(float Delta)
 		//VehicleUI->UpdateSpeed(VehiclePawn->GetChaosVehicleMovement()->GetForwardSpeed());
 		//VehicleUI->UpdateGear(VehiclePawn->GetChaosVehicleMovement()->GetCurrentGear());
 	}
+
+	if (BikeHUD)
+	{
+		BikeHUD->Speed = VehiclePawn->GetVelocity().Length();
+	}
+
+
 }
 
 void ABikePlayerController::OnPossess(APawn* InPawn)

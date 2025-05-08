@@ -144,6 +144,8 @@ void ABikePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// reset the vehicle 
 		EnhancedInputComponent->BindAction(ResetVehicleAction, ETriggerEvent::Triggered, this, &ABikePawn::ResetVehicle);
+
+		EnhancedInputComponent->BindAction(RespawnAction, ETriggerEvent::Triggered, this, &ABikePawn::Respawn);
 	}
 }
 
@@ -257,6 +259,18 @@ void ABikePawn::ResetVehicle(const FInputActionValue& Value)
 	MainBicycleMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 
 	UE_LOG(LogTemp, Error, TEXT("Reset Vehicle"));
+}
+
+void ABikePawn::Respawn(const FInputActionValue& Value) {
+	if (reachedCheckPoint) {
+		FVector test = GetActorLocation();
+		SetActorTransform(FTransform(LastCheckPointRotation, LastCheckPointLocation, FVector::OneVector), false, nullptr, ETeleportType::TeleportPhysics);
+		MainBicycleMesh->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+		MainBicycleMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		UE_LOG(LogTemp, Error, TEXT("Respawn Vehicle at %s vs actors prev: %s"), *LastCheckPointLocation.ToString() , *test.ToString());
+	}
+
+	
 }
 
 void ABikePawn::StartWheelie(const FInputActionValue& Value) {

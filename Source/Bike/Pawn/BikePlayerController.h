@@ -43,4 +43,6 @@ protected:
 
 	// End PlayerController interface
 	
+private:
+	class ABicycleHUD* BikeHUD;
 };

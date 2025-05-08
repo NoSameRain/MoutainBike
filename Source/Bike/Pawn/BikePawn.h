@@ -80,12 +80,27 @@ protected:
 	/** Wheelie Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* WheelieAction;
+	
+	/** Respawn Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* RespawnAction;
+
+
 
 	/** Keeps track of which camera is active */
 	bool bFrontCameraActive = false;
 
 	/** Keeps track of whether the vehicle is in a wheelie */
 	bool bIsWheelie = false;
+
+	UPROPERTY(EditAnywhere , BlueprintReadWrite, Category = "CheckPoint")
+	FVector LastCheckPointLocation;
+	
+	UPROPERTY(EditAnywhere , BlueprintReadWrite, Category = "CheckPoint")
+	FRotator LastCheckPointRotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CheckPoint")
+	bool reachedCheckPoint = false;
 
 public:	
 	// Called every frame
@@ -125,6 +140,9 @@ protected:
 
 	/** Handles reset vehicle input */
 	void ResetVehicle(const FInputActionValue& Value);
+
+	/** Handles respawn input */
+	void Respawn(const FInputActionValue& Value);
 
 	/** Called when the brake lights are turned on or off */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle")
