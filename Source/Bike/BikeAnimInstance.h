@@ -18,6 +18,8 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
+	bool hasWon;
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
 	class ABikePawn* BikePawn;
@@ -33,6 +35,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
 	bool isPedaling;
+
 
 	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
 	bool isAccelerating;

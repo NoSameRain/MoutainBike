@@ -86,6 +86,15 @@ protected:
 	class UInputAction* RespawnAction;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	class UAnimComposite* victoryComposite;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	//class ULevelSequence* VictoryLevelSequence;
+
+
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+	void VictorySceneAndAnimation();
 
 	/** Keeps track of which camera is active */
 	bool bFrontCameraActive = false;
@@ -108,6 +117,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	float additiveSteeringValue = 0.f;//
 
 protected:
 

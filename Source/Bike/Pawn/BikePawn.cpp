@@ -11,6 +11,11 @@
 #include "InputActionValue.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 
+#include "BikePlayerController.h"
+#include "Bike/BikeAnimInstance.h"
+#include "Animation/AnimComposite.h"
+//#include "Runtime/LevelSequence/Public/LevelSequencePlayer.h"
+
 // Sets default values
 ABikePawn::ABikePawn()
 {
@@ -169,8 +174,22 @@ void ABikePawn::Steering(const FInputActionValue& Value)
 	// get the input magnitude for steering
 	float SteeringValue = Value.Get<float>();
 
+	float speed = ChaosVehicleMovement->GetForwardSpeed();
+
+	float steerCoefficient = speed > 50.f ? 0.01 : 0.1f;
+
+	if (SteeringValue == 0.0f) {
+		// reset the steering value
+		additiveSteeringValue = 0.f;
+	}
+	else {
+		// add the input to the steering value
+		additiveSteeringValue += SteeringValue * steerCoefficient;
+
+	}
+
 	// add the input
-	ChaosVehicleMovement->SetSteeringInput(SteeringValue);
+	ChaosVehicleMovement->SetSteeringInput(additiveSteeringValue);
 }
 
 void ABikePawn::Throttle(const FInputActionValue& Value)
@@ -213,6 +232,7 @@ void ABikePawn::StartHandbrake(const FInputActionValue& Value)
 
 	// call the Blueprint hook for the break lights
 	BrakeLights(true);
+	UE_LOG(LogTemp, Error, TEXT("Handbrake Vehicle"));
 }
 
 void ABikePawn::StopHandbrake(const FInputActionValue& Value)
@@ -279,4 +299,20 @@ void ABikePawn::StartWheelie(const FInputActionValue& Value) {
 
 void ABikePawn::StopWheelie(const FInputActionValue& Value) {
 	bIsWheelie = false;
+}
+
+
+void ABikePawn::VictorySceneAndAnimation() {
+	// play the animation montage
+	ABikePlayerController* PlayerController = Cast<ABikePlayerController>(GetController());
+	if (PlayerController) {
+		DisableInput(PlayerController);
+		MainBicycleMesh->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+		MainBicycleMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	}
+	UBikeAnimInstance* animInst = Cast<UBikeAnimInstance>(HumanMesh->GetAnimInstance());
+	if (animInst) {
+		animInst->hasWon = true;
+	}
+
 }
