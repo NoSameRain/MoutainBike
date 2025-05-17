@@ -25,6 +25,7 @@ void ABicycleHUD::ShowGameWidget() {
 		GameWidget = CreateWidget<UUserWidget>(GetWorld(), GameWidgetClass);
 		GameWidget->AddToViewport();
 	}
+	EnableInput(GetOwningPlayerController());
 	UE_LOG(LogTemp, Warning, TEXT("Show Game"));
 }
 
@@ -35,6 +36,8 @@ void ABicycleHUD::ShowTimeWidget() {
 		TimeWidget->AddToViewport();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Show Timer"));
+
+	GetWorldTimerManager().SetTimer(countdownTimerHandle, this, &ABicycleHUD::timerFinished, 3.0f, false);
 }
 
 void ABicycleHUD::ShowFinishWidget() {
@@ -46,13 +49,22 @@ void ABicycleHUD::ShowFinishWidget() {
 	UE_LOG(LogTemp, Warning, TEXT("Show Finish"));
 }
 
+void ABicycleHUD::ShowNotFinishWidget() {
+	APlayerController* playerController = GetOwningPlayerController();
+	if (playerController && NotFinishWidgetClass) {
+		NotFinishWidget = CreateWidget<UUserWidget>(GetWorld(), NotFinishWidgetClass);
+		NotFinishWidget->AddToViewport();
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Show Not Finish"));
+}
+
 void ABicycleHUD::timerFinished() {
 	ShowGameWidget();
 	if (TimeWidget) {
 		TimeWidget->RemoveFromViewport();
 		TimeWidget = nullptr;
 	}
-
+	ShowGameWidget();
 	UE_LOG(LogTemp, Warning, TEXT("Timer finished!"));
 }
 
