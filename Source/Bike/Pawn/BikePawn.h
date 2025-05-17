@@ -45,6 +45,23 @@ public:
 	UPROPERTY(Category = Human, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UChaosWheeledVehicleMovementComponent* ChaosVehicleMovement;
 
+	UPROPERTY(Category = Human, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* BoxComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option2;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option3;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option4;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option6;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterSelect")
+	class USkeletalMesh* Option7;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -85,6 +102,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* RespawnAction;
 
+	/** Jump Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* JumpAction;
+	
+	/** Duck Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* DuckAction;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	class UAnimComposite* victoryComposite;
@@ -111,7 +136,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CheckPoint")
 	bool reachedCheckPoint = false;
 
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	class UAnimMontage* JumpUpMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	class UAnimMontage* VictoryMontage;
+
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimInstance* animInst;
+
 public:	
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	class UAnimMontage* JumpLoopMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	class UAnimMontage* DuckingMontage;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -140,6 +181,10 @@ protected:
 	void StopHandbrake(const FInputActionValue& Value);
 
 	/** Handles wheelie start/stop inputs */
+	void StartDuck(const FInputActionValue& Value);
+	void StopDuck(const FInputActionValue& Value);
+
+	/** Handles duck start/stop inputs */
 	void StartWheelie(const FInputActionValue& Value);
 	void StopWheelie(const FInputActionValue& Value);
 
@@ -155,11 +200,21 @@ protected:
 	/** Handles respawn input */
 	void Respawn(const FInputActionValue& Value);
 
+	void Jump(const FInputActionValue& Value);
+
 	/** Called when the brake lights are turned on or off */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle")
 	void BrakeLights(bool bBraking);
 
+
+
 public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle")
+	void BikeInAir();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
+	bool isBikeInAir = false;
+
 	/** Returns the cast Chaos Vehicle Movement subobject */
 	FORCEINLINE const UChaosWheeledVehicleMovementComponent* GetChaosVehicleMovement() const { return ChaosVehicleMovement; }
 
