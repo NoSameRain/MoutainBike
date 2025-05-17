@@ -4,6 +4,7 @@
 #include "BikePawn.h"
 
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
@@ -62,6 +63,10 @@ ABikePawn::ABikePawn()
 
 	MainBicycleMesh->SetSimulatePhysics(true);
 	MainBicycleMesh->SetCollisionProfileName(TEXT("Vehicle"));
+
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent->SetupAttachment(MainBicycleMesh);
+	BoxComponent->SetWorldScale3D(FVector(2.5f, 1.0f, 2.5f));
 
 	// Create the vehicle movement component
 	ChaosVehicleMovement = CreateDefaultSubobject<UChaosWheeledVehicleMovementComponent>(TEXT("VehicleMovement"));
@@ -138,6 +143,10 @@ void ABikePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(HandbrakeAction, ETriggerEvent::Completed, this, &ABikePawn::StopHandbrake);
 
 		// handbrake 
+		EnhancedInputComponent->BindAction(DuckAction, ETriggerEvent::Started, this, &ABikePawn::StartDuck);
+		EnhancedInputComponent->BindAction(DuckAction, ETriggerEvent::Completed, this, &ABikePawn::StopDuck);
+
+		// duck 
 		EnhancedInputComponent->BindAction(WheelieAction, ETriggerEvent::Started, this, &ABikePawn::StartWheelie);
 		EnhancedInputComponent->BindAction(WheelieAction, ETriggerEvent::Completed, this, &ABikePawn::StopWheelie);
 
@@ -151,6 +160,7 @@ void ABikePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(ResetVehicleAction, ETriggerEvent::Triggered, this, &ABikePawn::ResetVehicle);
 
 		EnhancedInputComponent->BindAction(RespawnAction, ETriggerEvent::Triggered, this, &ABikePawn::Respawn);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABikePawn::Jump);
 	}
 }
 
@@ -167,6 +177,9 @@ void ABikePawn::Tick(float Delta)
 	CameraYaw = FMath::FInterpTo(CameraYaw, 0.0f, Delta, 1.0f);
 
 	BackSpringArm->SetRelativeRotation(FRotator(0.0f, CameraYaw, 0.0f));
+
+	//float Speed = ChaosVehicleMovement->GetForwardSpeed();
+	//UE_LOG(LogTemp, Warning, TEXT("Speed: %f"), Speed);
 }
 
 void ABikePawn::Steering(const FInputActionValue& Value)
@@ -188,8 +201,15 @@ void ABikePawn::Steering(const FInputActionValue& Value)
 
 	}
 
+	BikeInAir();
+	if (isBikeInAir) {
+		MainBicycleMesh->AddRelativeRotation(FRotator(0.f, SteeringValue * 3.f, 0.f), true, nullptr, ETeleportType::TeleportPhysics);
+	}
+	else {
+		ChaosVehicleMovement->SetSteeringInput(additiveSteeringValue);
+	}
+
 	// add the input
-	ChaosVehicleMovement->SetSteeringInput(additiveSteeringValue);
 }
 
 void ABikePawn::Throttle(const FInputActionValue& Value)
@@ -198,6 +218,13 @@ void ABikePawn::Throttle(const FInputActionValue& Value)
 	float ThrottleValue = Value.Get<float>();
 
 	// add the input
+	/*BikeInAir();
+	if (isBikeInAir) {
+		MainBicycleMesh->AddRelativeRotation(FRotator(0.f, 0.f ,ThrottleValue * 5.f), true, nullptr, ETeleportType::TeleportPhysics);
+	}
+	else {
+		
+	}*/
 	ChaosVehicleMovement->SetThrottleInput(ThrottleValue);
 }
 
@@ -289,8 +316,23 @@ void ABikePawn::Respawn(const FInputActionValue& Value) {
 		MainBicycleMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 		UE_LOG(LogTemp, Error, TEXT("Respawn Vehicle at %s vs actors prev: %s"), *LastCheckPointLocation.ToString() , *test.ToString());
 	}
+}
 
-	
+void ABikePawn::Jump(const FInputActionValue& Value) {
+
+	BikeInAir();
+	if (isBikeInAir)return;
+
+	animInst = HumanMesh->GetAnimInstance();
+
+	if (animInst && JumpUpMontage) {
+		animInst->Montage_Play(JumpUpMontage);
+		UE_LOG(LogTemp, Error, TEXT("Jump Up Montage"));
+	}
+
+	MainBicycleMesh->SetPhysicsLinearVelocity(FVector(0.f, 0.f, 700.f) , true);
+	UE_LOG(LogTemp, Error, TEXT("Jump Vehicle"));
+
 }
 
 void ABikePawn::StartWheelie(const FInputActionValue& Value) {
@@ -299,6 +341,26 @@ void ABikePawn::StartWheelie(const FInputActionValue& Value) {
 
 void ABikePawn::StopWheelie(const FInputActionValue& Value) {
 	bIsWheelie = false;
+}
+
+void ABikePawn::StartDuck(const FInputActionValue& Value) {
+	animInst = HumanMesh->GetAnimInstance();
+
+	if (animInst && DuckingMontage) {
+		float a = animInst->Montage_Play(DuckingMontage);
+		UE_LOG(LogTemp, Error, TEXT("DuckingMontage Montage --- %f"), a);
+	}
+	BoxComponent->SetWorldScale3D(FVector(2.5f, 1.0f, 1.5f));
+}
+
+void ABikePawn::StopDuck(const FInputActionValue& Value) {
+	animInst = HumanMesh->GetAnimInstance();
+
+	if (animInst && DuckingMontage) {
+		animInst->Montage_Stop(0.1f, DuckingMontage);
+		UE_LOG(LogTemp, Error, TEXT("Stop DuckingMontage Montage"));
+	}
+	BoxComponent->SetWorldScale3D(FVector(2.5f, 1.0f, 2.5f));
 }
 
 
@@ -310,9 +372,16 @@ void ABikePawn::VictorySceneAndAnimation() {
 		MainBicycleMesh->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 		MainBicycleMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	}
-	UBikeAnimInstance* animInst = Cast<UBikeAnimInstance>(HumanMesh->GetAnimInstance());
-	if (animInst) {
-		animInst->hasWon = true;
+
+	animInst = HumanMesh->GetAnimInstance();
+
+	if (animInst && VictoryMontage) {
+		animInst->Montage_Play(VictoryMontage);
+		UE_LOG(LogTemp, Error, TEXT("Victory Montage"));
 	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Not Victory Montage"));
+	}
+
 
 }
