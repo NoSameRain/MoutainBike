@@ -29,6 +29,8 @@ void UBikeAnimInstance::NativeUpdateAnimation(float DeltaTime) {
 
 	Speed = BikePawn->ChaosVehicleMovement->GetForwardSpeed();
 
+
+
 	Lean = BikePawn->ChaosVehicleMovement->GetSteeringInput();
 
 	isAccelerating = Speed > 5.0f;
@@ -40,6 +42,19 @@ void UBikeAnimInstance::NativeUpdateAnimation(float DeltaTime) {
 	//isWheelie = BicyclePawn->GetChaosVehicleMovement()->IsWheelie();
 
 	//isPedaling = BicyclePawn->GetChaosVehicleMovement()->IsPedaling();
+
+	BikePawn->BikeInAir();
+	isInAir = BikePawn->isBikeInAir;
+
+
+	if (BikePawn->isBikeInAir) {
+		if (BikePawn->JumpLoopMontage) {
+			//Montage_Play(BikePawn->JumpLoopMontage);
+		}
+	}
+
+	//if(isInAir)
+	//UE_LOG(LogTemp, Warning, TEXT("Bike In Air"));
 
 
 }

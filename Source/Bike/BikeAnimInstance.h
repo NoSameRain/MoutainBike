@@ -36,6 +36,8 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
 	bool isPedaling;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
+	bool isInAir;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Bicycle", meta = (AllowPrivateAccess = "true"))
 	bool isAccelerating;

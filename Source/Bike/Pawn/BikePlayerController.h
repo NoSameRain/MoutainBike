@@ -37,6 +37,11 @@ public:
 	// End Actor interface
 
 	// Begin PlayerController interface
+
+	UFUNCTION(BlueprintCallable, Category = "Speed")
+	void StartScene();
+
+	void ShowGameWidget();
 protected:
 
 	virtual void OnPossess(APawn* InPawn) override;

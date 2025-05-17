@@ -52,3 +52,16 @@ void ABikePlayerController::OnPossess(APawn* InPawn)
 	// get a pointer to the controlled pawn
 	VehiclePawn = CastChecked<APawn>(InPawn);
 }
+
+void ABikePlayerController::StartScene() {
+	DisableInput(this);
+	FTimerHandle countdownTimerHandle;
+	GetWorldTimerManager().SetTimer(countdownTimerHandle, this, &ABikePlayerController::ShowGameWidget, 5.0f, false);
+}
+
+void ABikePlayerController::ShowGameWidget() {
+	if (BikeHUD)
+	{
+		BikeHUD->ShowTimeWidget();
+	}
+}
