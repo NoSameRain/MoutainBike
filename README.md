@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/ad9de93e-01ef-4477-8618-f829aaa6ac37
 
 ## For GitHub Repository
 
-### Development Overview
+### Development Overvie w
 This game was developed collaboratively by a team of 30 students as part of [Games Engineering MSc]. The project demonstrates advanced game development techniques using Unreal Engine.
 
 ### My Contributions
