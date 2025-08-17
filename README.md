@@ -40,7 +40,7 @@ My primary role in the project focused on graphics and project management, with 
 **Materials**
 - created landscape and check point materials.
 
-**Procedural Content Generation**aaaaaa
+**Procedural Content Generation**
 - generated foliage, trees, and rocks by unreal 5 PCG system.
 
 ---
